@@ -1,5 +1,6 @@
 import React from "react"
 import TimeCode from "./TimeCode"
+import "./Timesheet.css"
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -16,6 +17,7 @@ constructor() {
   this.setTotalTime = this.setTotalTime.bind(this)
   this.findCode = this.findCode.bind(this)
   this.setTime = this.setTime.bind(this)
+  this.deleteTimeCode = this.deleteTimeCode.bind(this)
 }
 
   handleChange(event) {
@@ -29,16 +31,38 @@ constructor() {
   componentDidUpdate(prevProps, prevState) {
     if (prevState.timesheetCodes !== this.state.timesheetCodes) {
       this.setTotalTime()
+      this.setStorage()
+    }
+  }
+
+  setStorage() {
+    localStorage.setItem('day', new Date(new Date().getFullYear(), new Date().getMonth() ,new Date().getDate()))
+    localStorage.setItem('timeCodes', JSON.stringify(this.state.timesheetCodes))
+  }
+
+  componentDidMount() {
+    let dailyCodes = JSON.parse(localStorage.getItem('timeCodes')),
+        today = new Date(new Date().getFullYear(), new Date().getMonth() ,new Date().getDate()),
+        savedDay = localStorage.getItem('day')
+    if(dailyCodes && String(today) === String(savedDay)){
+      this.setState({timesheetCodes: dailyCodes})
     }
   }
 
   setTime(id, timeRecorded) {
     let position = this.findCode(id)
-    console.log(this.findCode(id))
     this.setState(prevState => {
       let updatedTimesheetCodes = [...(prevState.timesheetCodes)]
       updatedTimesheetCodes[position].time = timeRecorded
-      console.log(updatedTimesheetCodes)
+      return({timesheetCodes: updatedTimesheetCodes})
+    })
+  }
+
+  deleteTimeCode(id) {
+    let position = this.findCode(id)
+    this.setState(prevState => {
+      let updatedTimesheetCodes = [...(prevState.timesheetCodes)]
+      updatedTimesheetCodes.splice(position, 1)
       return({timesheetCodes: updatedTimesheetCodes})
     })
   }
@@ -55,8 +79,21 @@ constructor() {
     })
   }
 
+  msToHMS(ms) {
+    let seconds = Math.floor(ms / 1000),
+        hours = parseInt( seconds / 3600 )
+    seconds = seconds % 3600
+    let minutes = parseInt( seconds / 60 )
+    seconds = seconds % 60
+    return `${hours >= 10 ? hours : '0'+hours}:${minutes >= 10 ? minutes : '0'+minutes}:${seconds >= 10 ? seconds : '0'+seconds}`
+  }
+
   handleSubmit(event) {
-    this.setState(prevState => {
+    if(this.state.timesheetCode===''){
+      alert('Please provide a timesheet code!')
+    }
+    else {
+      this.setState(prevState => {
         const unique = uuidv4()
         return {
           timesheetCodes: [
@@ -69,28 +106,54 @@ constructor() {
           }
           ]
         }
-      })
+      }, this.setState({timesheetCode:''}))
+    }
     event.preventDefault()
   }
 
   render(){
     return(
       <div>
-        <form onSubmit={this.handleSubmit}>
-          <label>
-            Timesheet Code    
-            <input
-              name="timesheetCode"
-              type="text"
-              id="timesheetCode"
-              onChange={this.handleChange}
-            />
-          </label>
-          <input type="submit" value="Submit" />
-        </form>
-        {this.state.timesheetCodes.map(timesheetCode => <TimeCode key={timesheetCode.key} {...timesheetCode} setTime={this.setTime}/> )}
-        <p> total: {this.state.totalTime}</p>
+        <div className='container-fluid'>
+          <form className='form-inline justify-content-center' onSubmit={this.handleSubmit}>
+            <div className="form-group"> 
+              <input
+                className="form-control"
+                name="timesheetCode"
+                type="text"
+                id="timesheetCode"
+                value={this.state.timesheetCode}
+                placeholder="New Timesheet Item..."
+                onChange={this.handleChange}
+              />
+              <button type="submit" className='btn btn-dark '>
+                <i className="fas fa-plus-circle"></i>
+              </button>
+            </div>
+          </form>
+          <br/>
+          <div className='container-fluid'>
+            {this.state.timesheetCodes.map(
+              (timesheetCode) => 
+                <TimeCode 
+                  key={timesheetCode.key} 
+                  {...timesheetCode} 
+                  setTime={this.setTime} 
+                  msToHMS={this.msToHMS}
+                  deleteTimeCode={this.deleteTimeCode}
+                /> 
+            )}
+          </div>
+          <br/>
+        </div>
+        <footer className='App-footer fixed-bottom'>
+          <p> 
+            Total Working Time Today: {this.msToHMS(this.state.totalTime)}
+          </p>
+          
+        </footer>
       </div>
+      
     )
   }
 }

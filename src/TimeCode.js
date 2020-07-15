@@ -11,6 +11,7 @@ class TimeCode extends React.Component {
     this.startTimer = this.startTimer.bind(this)
     this.stopTimer = this.stopTimer.bind(this)
     this.resetTimer = this.resetTimer.bind(this)
+    this.deleteTimer = this.deleteTimer.bind(this)
   }
   startTimer() {
     this.setState({
@@ -29,40 +30,66 @@ class TimeCode extends React.Component {
   }
   resetTimer() {
     this.setState({time: 0, isOn: false}, () => {
-      this.props.setTime(this.props.id, this.state.time)
+    this.props.setTime(this.props.id, this.state.time)
     })
-
+  }
+  deleteTimer() {
+    this.setState({isOn: false})
+    clearInterval(this.timer)
+    this.props.deleteTimeCode(this.props.id)
   }
 
-  msToHMS( ms ) {
-    let seconds = Math.floor(ms / 1000),
-        hours = parseInt( seconds / 3600 )
-    seconds = seconds % 3600
-    let minutes = parseInt( seconds / 60 )
-    seconds = seconds % 60
-    return `${hours >= 10 ? hours : '0'+hours}:${minutes >= 10 ? minutes : '0'+minutes}:${seconds >= 10 ? seconds : '0'+seconds}`
+  componentDidMount() {
+    this.setState({time: this.props.time})
   }
 
   render() {
-    let start = (this.state.time === 0) ?
-      <button onClick={this.startTimer}>start</button> :
+    let startBtn = (this.state.time === 0) ?
+      <button onClick={this.startTimer} className='btn btn-light'>
+        <i className="fas fa-play fa-sm"></i>
+      </button> :
       null
-    let stop = (this.state.time === 0 || !this.state.isOn) ?
+
+    let stopBtn = (this.state.time === 0 || !this.state.isOn) ?
       null :
-      <button onClick={this.stopTimer}>stop</button>
-    let resume = (this.state.time === 0 || this.state.isOn) ?
+      <button onClick={this.stopTimer} className='btn btn-light'>
+        <i className="fas fa-pause fa-sm"></i>
+      </button>
+
+    let resumeBtn = (this.state.time === 0 || this.state.isOn) ?
       null :
-      <button onClick={this.startTimer}>resume</button>
-    let reset = (this.state.time === 0 || this.state.isOn) ?
+      <button onClick={this.startTimer} className='btn btn-light'>
+        <i className="fas fa-play fa-sm"></i>
+      </button>
+
+    let resetBtn = (this.state.time === 0 || this.state.isOn) ?
       null :
-      <button onClick={this.resetTimer}>reset</button>
+      <button onClick={this.resetTimer} className='btn btn-light'>
+        <i className="fas fa-sync fa-sm"></i>
+      </button>
+
+    let deleteBtn = <button onClick={this.deleteTimer} className='btn btn-light'>
+                      <i className="fas fa-trash-alt fa-sm"></i>
+                    </button>
     return(
-      <div>
-        <h3>{this.props.code}: {this.msToHMS(this.state.time)}</h3>
-        {start}
-        {resume}
-        {stop}
-        {reset}
+      <div className='row justify-content-md-center'>
+        <div className='col col-lg-2'>
+          <p>
+            {this.props.code}:
+          </p>
+        </div>
+        <div className='col col-md-auto'>
+          <p>
+            {this.props.msToHMS(this.state.time)}
+          </p>
+        </div>
+        <div className='col col-lg-2'>
+          {startBtn}
+          {resumeBtn}
+          {stopBtn}
+          {resetBtn}
+          {deleteBtn}
+        </div>
       </div>
     )
   }
