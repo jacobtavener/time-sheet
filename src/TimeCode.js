@@ -35,7 +35,7 @@ class TimeCode extends React.Component {
     }), 1);
   }
   stopTimer() {
-    this.setState({isOn: false}, () => this.props.isActiveToggle(this.props.id, this.state.isOn))
+    this.setState({isOn: false})
     clearInterval(this.timer)
     this.props.setTime(this.props.id, this.state.time)
   }
@@ -47,6 +47,7 @@ class TimeCode extends React.Component {
   editTimer() {
     this.setState({inEdit: true})
     this.stopTimer()
+    this.props.isActiveToggle(this.props.id, false)
   }
   deleteTimer() {
     this.setState({isOn: false})
