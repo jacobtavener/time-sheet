@@ -18,6 +18,8 @@ constructor() {
   this.findCode = this.findCode.bind(this)
   this.setTime = this.setTime.bind(this)
   this.deleteTimeCode = this.deleteTimeCode.bind(this)
+  this.isActiveToggle = this.isActiveToggle.bind(this)
+  this.editTimesheetCode = this.editTimesheetCode.bind(this)
 }
 
   handleChange(event) {
@@ -28,16 +30,26 @@ constructor() {
     return this.state.timesheetCodes.findIndex(x => x.id === id)
   }
 
+  deleteTimeCode(id) {
+    let position = this.findCode(id)
+    this.setState(prevState => {
+      let updatedTimesheetCodes = [...(prevState.timesheetCodes)]
+      updatedTimesheetCodes.splice(position, 1)
+      return({timesheetCodes: updatedTimesheetCodes})
+    })
+  }
+
   componentDidUpdate(prevProps, prevState) {
     if (prevState.timesheetCodes !== this.state.timesheetCodes) {
       this.setTotalTime()
       this.setStorage()
+      // let oldActive = prevState.timesheetCodes.map(code => code.isActive),
+      //     newActive = this.state.timesheetCodes.map(code => code.isActive)
+      // if (oldActive !== newActive){
+      //   console.log(oldActive)
+      //   console.log(newActive)
+      // }
     }
-  }
-
-  setStorage() {
-    localStorage.setItem('day', new Date(new Date().getFullYear(), new Date().getMonth() ,new Date().getDate()))
-    localStorage.setItem('timeCodes', JSON.stringify(this.state.timesheetCodes))
   }
 
   componentDidMount() {
@@ -49,20 +61,26 @@ constructor() {
     }
   }
 
+  isActiveToggle(id, isOn) {
+    let position = this.findCode(id) 
+    this.setState((prevState) => {
+      let updatedTimesheetCodes= [...(prevState.timesheetCodes)]
+      updatedTimesheetCodes.forEach(timecode => timecode.isActive=false)
+      updatedTimesheetCodes[position].isActive = isOn
+      return({timesheetCodes: updatedTimesheetCodes})
+    }, () => console.log(this.state.timesheetCodes))
+  }
+
+  setStorage() {
+    localStorage.setItem('day', new Date(new Date().getFullYear(), new Date().getMonth() ,new Date().getDate()))
+    localStorage.setItem('timeCodes', JSON.stringify(this.state.timesheetCodes))
+  }
+
   setTime(id, timeRecorded) {
     let position = this.findCode(id)
     this.setState(prevState => {
       let updatedTimesheetCodes = [...(prevState.timesheetCodes)]
       updatedTimesheetCodes[position].time = timeRecorded
-      return({timesheetCodes: updatedTimesheetCodes})
-    })
-  }
-
-  deleteTimeCode(id) {
-    let position = this.findCode(id)
-    this.setState(prevState => {
-      let updatedTimesheetCodes = [...(prevState.timesheetCodes)]
-      updatedTimesheetCodes.splice(position, 1)
       return({timesheetCodes: updatedTimesheetCodes})
     })
   }
@@ -79,8 +97,22 @@ constructor() {
     })
   }
 
+  editTimesheetCode(id, newCode, newTime) {
+    let position = this.findCode(id)
+    this.setState(prevState => {
+      let updatedTimesheetCodes = [...(prevState.timesheetCodes)]
+      updatedTimesheetCodes[position].code = newCode
+      updatedTimesheetCodes[position].time = newTime
+      return({timesheetCodes: updatedTimesheetCodes})
+    })
+  }
+
+  msToMins(ms) {
+    return  `${Math.ceil(ms / 60000)} mins`
+  }
+
   msToHMS(ms) {
-    let seconds = Math.floor(ms / 1000),
+    let seconds = Math.ceil(ms / 1000),
         hours = parseInt( seconds / 3600 )
     seconds = seconds % 3600
     let minutes = parseInt( seconds / 60 )
@@ -101,6 +133,8 @@ constructor() {
           {
             code: this.state.timesheetCode,
             time: 0,
+            isActive: false,
+            inEdit: false,
             id: unique,
             key: unique
           }
@@ -140,7 +174,10 @@ constructor() {
                   {...timesheetCode} 
                   setTime={this.setTime} 
                   msToHMS={this.msToHMS}
+                  msToMins={this.msToMins}
                   deleteTimeCode={this.deleteTimeCode}
+                  isActiveToggle={this.isActiveToggle}
+                  editTimesheetCode ={this.editTimesheetCode}
                 /> 
             )}
           </div>
