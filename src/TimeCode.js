@@ -1,4 +1,6 @@
 import React from "react"
+import { Button, Form} from 'react-bootstrap';
+import {msToMins, msToHMS} from "./HelperFunctions"
 
 class TimeCode extends React.Component {
   constructor(props){
@@ -69,13 +71,19 @@ class TimeCode extends React.Component {
   }
   handleEditSubmit(event) {
     let 
-    codeEdit = this.state.codeEdit ? this.state.codeEdit : this.props.code,
+    codeEdit = this.state.codeEdit ? this.state.codeEdit.trim() : this.props.code,
     hourEdit = this.state.hourEdit ? this.state.hourEdit : this.getTime('hours'),
     minEdit = this.state.minEdit ? this.state.minEdit : this.getTime('minutes'),
     secondEdit = this.state.secondEdit ? this.state.secondEdit : this.getTime('seconds'),
     timeEdit = ((hourEdit*60*60*1000)+(minEdit*60*1000)+secondEdit*1000)
     this.props.editTimesheetCode(this.props.id, codeEdit, timeEdit)
     this.setState({inEdit:false})
+    this.setState({
+      codeEdit:'',
+      hourEdit: '',
+      minEdit: '',
+      secondEdit
+    })
     event.preventDefault()
   }
   getTime(type) {
@@ -95,9 +103,6 @@ class TimeCode extends React.Component {
     }
   }
   componentDidUpdate(prevProps, prevState) {
-    // if (prevState.isOn !== this.state.isOn){
-      
-    // }
     if (prevProps.isActive !== this.props.isActive && this.props.isActive === false){
       this.stopTimer()
     }
@@ -108,40 +113,40 @@ class TimeCode extends React.Component {
 
   render() {
     let startBtn = (this.state.time === 0) ?
-      <button onClick={this.startTimer} className='btn btn-light' id="stop-btn">
+      <Button onClick={this.startTimer} className='btn btn-light' id="stop-btn">
         <i className="fas fa-play fa-sm"></i>
-      </button> :
+      </Button> :
       null
 
     let stopBtn = (this.state.time === 0 || !this.state.isOn) ?
       null :
-      <button onClick={this.stopTimer} className='btn btn-light'>
+      <Button onClick={this.stopTimer} className='btn btn-light'>
         <i className="fas fa-pause fa-sm"></i>
-      </button>
+      </Button>
 
     let resumeBtn = (this.state.time === 0 || this.state.isOn) ?
       null :
-      <button onClick={this.startTimer} className='btn btn-light'>
+      <Button onClick={this.startTimer} className='btn btn-light'>
         <i className="fas fa-play fa-sm"></i>
-      </button>
+      </Button>
 
     let resetBtn = (this.state.time === 0 || this.state.isOn) ?
       null :
-      <button onClick={this.resetTimer} className='btn btn-light'>
+      <Button onClick={this.resetTimer} className='btn btn-light'>
         <i className="fas fa-sync fa-sm"></i>
-      </button>
+      </Button>
 
-    let editBtn  = <button onClick={this.editTimer} className='btn btn-light'>
+    let editBtn  = <Button onClick={this.editTimer} className='btn btn-light'>
                     <i className="far fa-edit fa-sm"></i>
-                  </button>
+                  </Button>
 
-    let deleteBtn = <button onClick={this.deleteTimer} className='btn btn-light'>
+    let deleteBtn = <Button onClick={this.deleteTimer} className='btn btn-light'>
                       <i className="fas fa-trash-alt fa-sm"></i>
-                    </button>
-    let toggleView = <button onClick={this.handleToggle} className='btn btn-light'>
+                    </Button>
+    let toggleView = <Button onClick={this.handleToggle} className='btn btn-light'>
                       <i className="fas fa-exchange-alt"></i>
-                    </button>
-    let time = this.state.simpleView ? this.props.msToMins(this.state.time) : this.props.msToHMS(this.state.time)
+                    </Button>
+    let time = this.state.simpleView ? msToMins(this.state.time) : msToHMS(this.state.time)
     if (this.state.inEdit===false) {
       return(
         <div className='row justify-content-md-center align-self-center'>
@@ -168,49 +173,58 @@ class TimeCode extends React.Component {
       )
     } else {
       return(
-        <form className='form-inline justify-content-center' onSubmit={this.handleEditSubmit}>
-          <div className="form-group"> 
-            <input
-              className="form-control"
-              name="codeEdit"
-              type="text"
-              id="codeEdit"
+        <Form className='form-inline justify-content-center' onSubmit={this.handleEditSubmit}>
+          <Form.Group>
+            <Form.Control 
+              as="input"
+              name="codeEdit" 
+              id="codeEdit" 
               value={this.state.codeEdit}
               placeholder={this.props.code}
-              onChange={this.handleChange}
-            />
-            <input
-              className="form-control"
+              onChange={this.handleChange}>
+            </Form.Control>
+          </Form.Group>
+          <Form.Group>
+            <Form.Control 
+              as="input"
               name="hourEdit"
-              type="text"
+              type="number"
+              min="0"
+              max="23"
               id="hourEdit"
               value={this.state.hourEdit}
               placeholder={`${this.getTime('hours') >= 10 ? this.getTime('hours') : '0'+ this.getTime('hours')}`}
-              onChange={this.handleChange}
-            />
-            <input
-              className="form-control"
+              onChange={this.handleChange}>
+            </Form.Control>
+            <Form.Control 
+              as="input"
               name="minEdit"
-              type="text"
+              type="number"
+              min="0"
+              max="59"
               id="minEdit"
               value={this.state.minEdit}
               placeholder={`${this.getTime('minutes') >= 10 ? this.getTime('minutes') : '0'+ this.getTime('minutes')}`}
-              onChange={this.handleChange}
-            />
-            <input
-              className="form-control"
+              onChange={this.handleChange}>
+            </Form.Control>
+            <Form.Control 
+              as="input"
               name="secondEdit"
-              type="text"
+              type="number"
+              min="0"
+              max="59"
               id="secondEdit"
               value={this.state.secondEdit}
               placeholder={`${this.getTime('seconds') >= 10 ? this.getTime('seconds') : '0'+ this.getTime('seconds')}`}
-              onChange={this.handleChange}
-            />
-            <button type="submit" className='btn btn-dark '>
+              onChange={this.handleChange}>
+            </Form.Control>
+          </Form.Group>
+          <Form.Group>
+            <Button type="submit" className='btn btn-dark '>
             <i className="fas fa-check"></i>
-            </button>
-          </div>
-      </form>
+            </Button>
+          </Form.Group>
+        </Form>
       )
       
     }
