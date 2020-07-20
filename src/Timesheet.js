@@ -4,7 +4,7 @@ import TimeCode from "./TimeCode"
 import Footer from "./Footer"
 import NewTimesheetCodeForm from "./NewTimesheetCodeForm"
 
-import { msToMins, msToHMS } from "./HelperFunctions"
+import { msToHMS } from "./HelperFunctions"
 
 import "./Timesheet.css"
 import  'bootstrap/dist/css/bootstrap.css'
