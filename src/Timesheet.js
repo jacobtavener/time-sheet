@@ -4,7 +4,7 @@ import TimeCode from "./TimeCode"
 import Footer from "./Footer"
 import NewTimesheetCodeForm from "./NewTimesheetCodeForm"
 
-import { msToHMS } from "./HelperFunctions"
+import { msToMins, msToHMS } from "./HelperFunctions"
 
 import "./Timesheet.css"
 import  'bootstrap/dist/css/bootstrap.css'
@@ -16,7 +16,8 @@ constructor() {
   super()
   this.state = {
     timesheetCodes: [],
-    totalTime: 0
+    totalTime: 0,
+    exportData: []
   }
   this.newTimesheetCodeSubmit = this.newTimesheetCodeSubmit.bind(this)
   this.setTotalTime = this.setTotalTime.bind(this)
@@ -100,19 +101,6 @@ constructor() {
     localStorage.setItem('day', new Date(new Date().getFullYear(), new Date().getMonth() ,new Date().getDate()))
     localStorage.setItem('timeCodes', JSON.stringify(this.state.timesheetCodes))
   }
-
-  // msToMins(ms) {
-  //   return  `${Math.ceil(ms / 60000)} mins`
-  // }
-
-  // msToHMS(ms) {
-  //   let seconds = Math.ceil(ms / 1000),
-  //       hours = parseInt( seconds / 3600 )
-  //   seconds = seconds % 3600
-  //   let minutes = parseInt( seconds / 60 )
-  //   seconds = seconds % 60
-  //   return `${hours >= 10 ? hours : '0'+hours}:${minutes >= 10 ? minutes : '0'+minutes}:${seconds >= 10 ? seconds : '0'+seconds}`
-  // }
 
   // Form Submit Handlers
   transferTime(firstCode, secondCode, timeInput) {

@@ -63,7 +63,6 @@ class TransferTime extends React.Component {
         <Button bg='#282c34' variant='dark' onClick={this.handleShow}>
           Transfer Time
         </Button>
-  
         <Modal show={this.state.show} onHide={this.handleClose}>
           <Modal.Header closeButton>
             <Modal.Title>Transfer Time</Modal.Title>

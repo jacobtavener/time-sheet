@@ -2,6 +2,8 @@ import React from "react"
 import { Button, Form} from 'react-bootstrap';
 import {msToMins, msToHMS} from "./HelperFunctions"
 
+import 'bootstrap/dist/css/bootstrap.css'
+
 class TimeCode extends React.Component {
   constructor(props){
     super(props)
