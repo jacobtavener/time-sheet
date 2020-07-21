@@ -1,9 +1,9 @@
 import React from 'react';
 
-import Header from './Header'
-import Timesheet from './Timesheet'
+import Header from '../components/Header'
+import Timesheet from '../components/Timesheet'
 
-import './App.css';
+import '../styling/App.css';
 
 function App() {
   return (

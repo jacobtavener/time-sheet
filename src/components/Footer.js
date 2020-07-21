@@ -1,7 +1,7 @@
 import React from "react"
-import TransferTime from "./TransferTime"
-import Download from "./Download"
-import {msToMins} from './HelperFunctions'
+import TransferTime from "../components/TransferTime"
+import Download from "../components/Download"
+import {msToMins} from '../helpers/HelperFunctions'
 
 const { v4: uuidv4 } = require('uuid');
 

@@ -1,6 +1,6 @@
 import React from "react"
 import { Button, Form} from 'react-bootstrap';
-import {msToMins, msToHMS} from "./HelperFunctions"
+import {msToMins, msToHMS} from "../helpers/HelperFunctions"
 
 import 'bootstrap/dist/css/bootstrap.css'
 

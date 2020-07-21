@@ -1,12 +1,12 @@
 import React from "react"
 
-import TimeCode from "./TimeCode"
-import Footer from "./Footer"
-import NewTimesheetCodeForm from "./NewTimesheetCodeForm"
+import TimeCode from "../components/TimeCode"
+import Footer from "../components/Footer"
+import NewTimesheetCodeForm from "../components/NewTimesheetCodeForm"
 
-import { msToHMS } from "./HelperFunctions"
+import { msToHMS } from "../helpers/HelperFunctions"
 
-import "./Timesheet.css"
+import "../styling/Timesheet.css"
 import  'bootstrap/dist/css/bootstrap.css'
 
 const { v4: uuidv4 } = require('uuid');

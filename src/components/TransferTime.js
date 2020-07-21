@@ -83,7 +83,7 @@ class TransferTime extends React.Component {
                 </Form.Control>
               </Form.Group>
               <Form.Group>
-                <Form.Label>Transfer From</Form.Label>
+                <Form.Label>Transfer To</Form.Label>
                 <Form.Control 
                   as="select" 
                   name="secondCode" 
