@@ -3,6 +3,7 @@ import React from "react"
 import TimeCode from "../components/TimeCode"
 import Footer from "../components/Footer"
 import NewTimesheetCodeForm from "../components/NewTimesheetCodeForm"
+import BackgroundTimer from "./BackgroundTimer"
 
 import { msToHMS } from "../helpers/HelperFunctions"
 
@@ -17,7 +18,9 @@ constructor() {
   this.state = {
     timesheetCodes: [],
     totalTime: 0,
-    exportData: []
+    exportData: [],
+    backgroundTimerShow: false,
+    backgroundTimerInfo: ''
   }
   this.newTimesheetCodeSubmit = this.newTimesheetCodeSubmit.bind(this)
   this.setTotalTime = this.setTotalTime.bind(this)
@@ -28,6 +31,8 @@ constructor() {
   this.isActiveToggle = this.isActiveToggle.bind(this)
   this.editTimesheetCode = this.editTimesheetCode.bind(this)
   this.transferTime = this.transferTime.bind(this)
+  this.handleBackgroundTimerModalClose = this.handleBackgroundTimerModalClose.bind(this)
+  this.handleBackgroundTimerModalSave = this.handleBackgroundTimerModalSave.bind(this)
 }
 
   // Finding Position Within timesheetCodes
@@ -46,7 +51,7 @@ constructor() {
       updatedTimesheetCodes.forEach(timecode => timecode.isActive=false)
       updatedTimesheetCodes[position].isActive = isOn
       return({timesheetCodes: updatedTimesheetCodes})
-    }, () => console.log(this.state.timesheetCodes))
+    })
   }
   setTime(id, timeRecorded) {
     let position = this.findCode(id)
@@ -102,11 +107,36 @@ constructor() {
     localStorage.setItem('timeCodes', JSON.stringify(this.state.timesheetCodes))
   }
 
+  // handle background timer modal
+  handleBackgroundTimerModalClose(){
+    this.setState(() => {
+      return(
+        {
+          backgroundTimerShow:false,
+          backgroundTimerInfo:''
+        }
+      )
+    })
+  }
+  handleBackgroundTimerModalSave(id, timeAddition){
+    let codePosition = this.findCode(id)
+    this.setState(prevState => {
+      let updatedTimesheetCodes = [...(prevState.timesheetCodes)],
+          updatedCode = {...updatedTimesheetCodes[codePosition]}
+      updatedCode.time = prevState.timesheetCodes[codePosition].time + timeAddition
+      updatedTimesheetCodes[codePosition] = updatedCode
+      return ({
+        backgroundTimerShow:false,
+        backgroundTimerInfo:'',
+        timesheetCodes: updatedTimesheetCodes
+      })
+    })
+  }
+
   // Form Submit Handlers
   transferTime(firstCode, secondCode, timeInput) {
     let firstCodePosition = this.findCodeByCode(firstCode),
         secondCodePosition = this.findCodeByCode(secondCode)
-    console.log(timeInput)
     if(this.state.timesheetCodes[firstCodePosition].time >= timeInput){
       this.setState(prevState => {
         let updatedTimesheetCodes = [...(prevState.timesheetCodes)],
@@ -165,14 +195,35 @@ constructor() {
   componentDidMount() {
     let dailyCodes = JSON.parse(localStorage.getItem('timeCodes')),
         today = new Date(new Date().getFullYear(), new Date().getMonth() ,new Date().getDate()),
-        savedDay = localStorage.getItem('day')
+        savedDay = localStorage.getItem('day'),
+        running = JSON.parse(localStorage.getItem('running'))
+
     if(dailyCodes && String(today) === String(savedDay)){
       this.setState({timesheetCodes: dailyCodes})
+    } else {
+      localStorage.clear()
+    }
+    if (running) {
+      running["timeChange"] = Date.now() - running.startTime
+      this.setState(() => {
+        return(
+          {
+            backgroundTimerShow:true,
+            backgroundTimerInfo:running
+          }
+        )
+      }, localStorage.removeItem('running'))
     }
   }
   render(){
     return(
       <div>
+        <BackgroundTimer 
+          backgroundTimerShow={this.state.backgroundTimerShow}
+          backgroundTimerInfo={this.state.backgroundTimerInfo}
+          handleBackgroundTimerModalClose={this.handleBackgroundTimerModalClose}
+          handleBackgroundTimerModalSave={this.handleBackgroundTimerModalSave}
+        />
         <div className='container-fluid'>
           <NewTimesheetCodeForm 
             newTimesheetCodeSubmit={this.newTimesheetCodeSubmit}

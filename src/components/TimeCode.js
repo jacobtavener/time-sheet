@@ -37,11 +37,13 @@ class TimeCode extends React.Component {
     this.timer = setInterval(() => this.setState({
       time: Date.now() - this.state.start
     }), 1);
+    localStorage.setItem('running', JSON.stringify({id:this.props.id, timecode:this.props.code, startTime: Date.now()}))
   }
   stopTimer() {
     this.setState({isOn: false})
     clearInterval(this.timer)
     this.props.setTime(this.props.id, this.state.time)
+    localStorage.removeItem('running')
   }
   resetTimer() {
     this.setState({time: 0, isOn: false}, () => {
